@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block title %}Мониторинг{% endblock %}{% block content %}
+<h1>Мониторинг сервиса</h1>
+<div class="toolbar">{% if need_token %}<input id="tok" placeholder="ADMIN_TOKEN">{% endif %}
+<button id="run">▶ Запустить обработку сейчас</button> <span id="runmsg" class="muted"></span></div>
+<div class="stats" id="stats">загрузка…</div>
+<h2>Воркеры</h2><table id="workers"></table>
+<h2>Последние запуски</h2><table id="runs"></table>
+<h2>События (live, SSE)</h2><div id="log" class="log"></div>
+<script>
+const $=id=>document.getElementById(id);
+$('run').onclick=async()=>{const t=$('tok')?$('tok').value:'';const r=await fetch('/api/runs/trigger',{method:'POST',headers:{'X-Admin-Token':t}});
+ const j=await r.json().catch(()=>({}));$('runmsg').textContent=r.ok?j.message:('Ошибка '+r.status);loadRuns();};
+async function loadRuns(){const r=await (await fetch('/api/runs')).json();
+ $('runs').innerHTML='<tr><th>#</th><th>статус</th><th>триггер</th><th>источник</th><th>старт (UTC)</th><th>ок</th><th>ошибок</th></tr>'+r.map(x=>`<tr><td>${x.id}</td><td class="st-${x.status}">${x.status}</td><td>${x.trigger}</td><td>${x.source||''}</td><td>${(x.started_at||'').slice(0,19)}</td><td>${x.games_processed}</td><td>${x.games_failed}</td></tr>`).join('');}
+loadRuns();setInterval(loadRuns,10000);
+const es=new EventSource('/api/events/stream');
+es.addEventListener('job',e=>{const d=JSON.parse(e.data);const div=document.createElement('div');div.className='ev '+d.level;
+ div.textContent=`${d.ts.slice(0,19)} [${d.worker}] ${d.message}`;$('log').prepend(div);});
+es.addEventListener('status',e=>{const s=JSON.parse(e.data);const lr=s.last_run;
+ $('stats').innerHTML=`<div><b>${s.running?'🟢 идёт обработка':'⚪ ожидание'}</b></div><div>Игр в базе: <b>${s.games_total}</b></div><div>Обработано сегодня: <b>${s.processed_today}</b></div><div>Запусков: <b>${s.runs_total}</b></div><div>Следующий запуск: ${s.next_run||'—'}</div>`+(lr?`<div>Последний run #${lr.id}: ${lr.status}, ${lr.processed} ок / ${lr.failed} ошибок</div>`:'');
+ $('workers').innerHTML='<tr><th>воркер</th><th>статус</th><th>прогресс</th><th>сообщение</th></tr>'+Object.entries(s.workers).map(([k,v])=>`<tr><td>${k}</td><td>${v.status||''}</td><td>${v.total?`${v.processed}/${v.total}`:''}</td><td>${v.message||''}</td></tr>`).join('');});
+</script>{% endblock %}

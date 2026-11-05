@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Metacritic Games{% endblock %}</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/style.css">
+<script>
+(function(){
+  var t = localStorage.getItem('theme');
+  if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+<header>
+  <a href="/" class="logo">🎮 MC Games</a>
+  <nav><a href="/">Игры</a><a href="/monitor">Мониторинг</a><a href="/docs">API</a></nav>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Переключить тему">🌙 Тёмная</button>
+</header>
+<main>{% block content %}{% endblock %}</main>
+<script>
+(function(){
+  var btn = document.getElementById('themeToggle');
+  function sync(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀️ Светлая' : '🌙 Тёмная';
+  }
+  sync();
+  btn.addEventListener('click', function(){
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    sync();
+  });
+})();
+</script>
+</body>
+</html>

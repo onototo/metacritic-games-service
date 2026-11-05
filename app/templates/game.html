@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% block title %}{{ g.title }}{% endblock %}{% block content %}
+<a href="/">← к списку</a>
+<div class="hero">{% if g.cover_url %}<img src="{{ g.cover_url }}" referrerpolicy="no-referrer" alt="">{% endif %}
+<div><h1>{{ g.title }}</h1>
+<p><b>Разработчик:</b> {{ g.developer or '—' }} · <b>Издатель:</b> {{ g.publisher or '—' }}</p>
+<p><b>Релиз:</b> {{ g.release_date or '—' }} · <b>Жанр:</b> {{ (g.genres or [])|join(', ') or '—' }}</p>
+<table><tr><th>Платформа</th><th>Metascore</th><th>Userscore</th></tr>
+{% for p in g.platforms %}<tr><td>{{ p.platform }}</td><td>{{ p.metascore or 'tbd' }}</td><td>{{ p.userscore or 'tbd' }}</td></tr>{% endfor %}</table>
+<p>{% if g.video_url %}<a href="{{ g.video_url }}" target="_blank">▶ Трейлер</a> · {% endif %}<a href="{{ g.metacritic_url }}" target="_blank">Metacritic</a></p>
+</div></div>
+<h2>Описание</h2><p>{{ g.description or '—' }}</p>
+<div class="two">{% for src,label in [("critics","Резюме отзывов критиков"),("users","Резюме отзывов игроков")] %}{% set s = g.summary(src) %}
+<section class="box"><h3>{{ label }}</h3>{% if s and s.summary_text %}<p class="pre">{{ s.summary_text }}</p>
+<p class="muted small">{{ s.reviews_used }} отзывов · {{ s.provider }} · {{ s.updated_at.strftime('%Y-%m-%d %H:%M') }} UTC</p>{% else %}<p class="muted">Отзывов пока нет</p>{% endif %}</section>{% endfor %}</div>
+<section class="box"><h3>Летсплей (YouTube)</h3>
+{% if g.letsplay_url %}<p><a href="{{ g.letsplay_url }}" target="_blank">{{ g.letsplay_title }}</a></p><p class="pre">{{ g.letsplay_conclusion or '' }}</p>{% endif %}
+<p class="muted small">Статус: {{ g.letsplay_status or 'не обработано' }}</p></section>
+<h2>Похожие игры</h2><ul>{% for sc,x in similar %}<li><a href="/games/{{ x.id }}">{{ x.title }}</a> <span class="muted small">({{ '%.2f'|format(sc) }})</span></li>{% else %}<li class="muted">Нет похожих в базе</li>{% endfor %}</ul>
+{% endblock %}

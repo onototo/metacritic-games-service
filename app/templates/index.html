@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}
+<form class="filters" hx-get="/" hx-target="#games" hx-trigger="input changed delay:300ms from:input, change from:select" hx-push-url="true">
+  <input type="search" name="q" value="{{ q }}" placeholder="Поиск по названию…">
+  <select name="platform"><option value="">Все платформы</option>
+    {% for p in platforms %}<option value="{{ p }}" {% if p==platform %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>
+  <select name="sort">
+    {% for k,v in [("metascore","Metascore ↓"),("metascore_asc","Metascore ↑"),("userscore","Userscore ↓"),("title","Название"),("updated","Обновлённые")] %}
+    <option value="{{k}}" {% if k==sort %}selected{% endif %}>{{v}}</option>{% endfor %}</select>
+</form>
+<div id="games">{% include "_games.html" %}</div>
+{% endblock %}

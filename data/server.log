@@ -1,0 +1,101 @@
+INFO:     Started server process [11249]
+INFO:     Waiting for application startup.
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "run_once" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:apscheduler.executors.default:Running job "run_once (trigger: interval[1:00:00], next run at: 2026-11-05 10:32:16 +03)" (scheduled at 2026-11-05 10:32:16.242237+03:00)
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/browse/game/all/all/all-time/new/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/play-and-learn-my-first-korean/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/play-and-learn-my-first-korean/user-reviews/?platform=nintendo-switch "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:52420 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52424 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52432 - "GET /?q=zelda&platform=PC&sort=userscore HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52440 - "GET /games/4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52442 - "GET /api/events/stream HTTP/1.1" 200 OK
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+WARNING:asyncio:socket.send() raised exception.
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/play-and-learn-my-first-korean/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/mono-chameleon/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/mono-chameleon/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/mono-chameleon/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/stamperor-the-jesters-decree/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/stamperor-the-jesters-decree/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/stamperor-the-jesters-decree/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/novalex-project-zero/ "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:54716 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54716 - "GET /static/style.css HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/novalex-project-zero/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:54716 - "GET /games/4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54716 - "GET /monitor HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54724 - "GET /api/events/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54716 - "GET /api/runs HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/novalex-project-zero/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/neon-rhythm-plus/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/neon-rhythm-plus/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/neon-rhythm-plus/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/sheepscape/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/sheepscape/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/sheepscape/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/manala-equinox-war/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/manala-equinox-war/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:37382 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37382 - "GET /static/style.css HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/manala-equinox-war/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/feed-me-more-brains/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/feed-me-more-brains/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:37382 - "GET /games/4 HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/feed-me-more-brains/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/starfort/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/starfort/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/starfort/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/artificial-ambition/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/artificial-ambition/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/artificial-ambition/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/vilnius-museum-of-antiquities-a-temple-of-the-past/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/vilnius-museum-of-antiquities-a-temple-of-the-past/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/vilnius-museum-of-antiquities-a-temple-of-the-past/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/boomer-wumbo-workshop/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/boomer-wumbo-workshop/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/boomer-wumbo-workshop/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/sort-them-fish/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/sort-them-fish/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/sort-them-fish/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/amber-of-the-end/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/amber-of-the-end/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/amber-of-the-end/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/realm-of-advent/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/realm-of-advent/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/realm-of-advent/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/imperial-kingdoms/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/imperial-kingdoms/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/imperial-kingdoms/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/prehistoric-pit/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/prehistoric-pit/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/prehistoric-pit/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/dirt-clicker/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/dirt-clicker/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/dirt-clicker/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/next-of-kin-epiphany/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/next-of-kin-epiphany/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/next-of-kin-epiphany/user-reviews/?platform=xbox-series-x "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/next-of-kin-epiphany/user-reviews/?platform=nintendo-switch "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/next-of-kin-epiphany/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/great-achievements/ "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/great-achievements/user-reviews/?platform=pc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://www.metacritic.com/game/great-achievements/critic-reviews/ "HTTP/1.1 200 OK"
+INFO:apscheduler.executors.default:Job "run_once (trigger: interval[1:00:00], next run at: 2026-11-05 11:32:16 +03)" executed successfully
+INFO:     127.0.0.1:44106 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [11249]

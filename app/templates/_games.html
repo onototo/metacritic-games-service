@@ -1,0 +1,10 @@
+<p class="muted">Найдено: {{ games|length }}</p>
+<div class="grid">{% for g in games %}
+<a class="card" href="/games/{{ g.id }}">
+  {% if g.cover_url %}<img src="{{ g.cover_url }}" loading="lazy" referrerpolicy="no-referrer" alt="">{% endif %}
+  <div class="card-body"><h3>{{ g.title }}</h3>
+  <div class="scores"><span class="ms {% if g.metascore %}{% if g.metascore>=75 %}good{% elif g.metascore>=50 %}mid{% else %}bad{% endif %}{% endif %}">{{ g.metascore or 'tbd' }}</span>
+  <span class="us">{{ g.userscore or 'tbd' }}</span></div>
+  <div class="muted small">{{ g.platforms|map(attribute='platform')|join(', ') }}</div>
+  <div class="muted small">{{ g.developer or '' }}</div></div>
+</a>{% else %}<p>Пока нет игр. Запустите обработку на странице <a href="/monitor">мониторинга</a>.</p>{% endfor %}</div>
