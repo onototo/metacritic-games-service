@@ -33,6 +33,37 @@ def test_parse_game():
     assert g.title and g.cover_url and g.platforms and g.description
 
 
+def test_cover_url_from_ld_or_dom():
+    coverage = scraper.parse_game(read("https://www.metacritic.com/game/coverage/"),
+                                  "https://www.metacritic.com/game/coverage/")
+    assert coverage.title == "Coverage"
+    assert coverage.cover_url and "catalog/provider" in coverage.cover_url
+    assert coverage.metascore is None and coverage.userscore is None
+
+    nie = scraper.parse_game(read("https://www.metacritic.com/game/nie-xiaoqian/"),
+                             "https://www.metacritic.com/game/nie-xiaoqian/")
+    assert nie.cover_url and "catalog/provider" in nie.cover_url
+    assert nie.metascore is None and nie.userscore is None
+
+    as_dict = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Dict Cover",
+        "image":{"url":"https://www.metacritic.com/a/img/catalog/provider/from-dict.jpg"}}</script>'''
+    assert scraper.parse_game(as_dict, "https://www.metacritic.com/game/dict-cover/").cover_url.endswith("from-dict.jpg")
+
+    as_list = '''<script type="application/ld+json">{"@type":"VideoGame","name":"List Cover",
+        "image":[{"contentUrl":"https://www.metacritic.com/a/img/catalog/provider/from-list.jpg"}]}</script>
+        <img src="https://www.metacritic.com/a/img/catalog/provider/dom-should-lose.jpg">'''
+    assert scraper.parse_game(as_list, "https://www.metacritic.com/game/list-cover/").cover_url.endswith("from-list.jpg")
+
+    srcset = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Srcset Cover"}</script>
+        <div data-testid="hero-images"><img srcset="https://www.metacritic.com/a/img/catalog/provider/hero.jpg 1x, https://x/2.jpg 2x"></div>
+        <img src="https://www.metacritic.com/a/img/catalog/provider/later.jpg">'''
+    assert scraper.parse_game(srcset, "https://www.metacritic.com/game/srcset-cover/").cover_url.endswith("hero.jpg")
+
+    pb_url = "https://www.metacritic.com/game/phantom-blade-zero/"
+    pb = scraper.parse_game(read(pb_url), pb_url)
+    assert "7-1792649959" in pb.cover_url and pb.metascore == 88
+
+
 def test_mock_summary_and_jsonl():
     from app import llm
     text, prov = llm.summarize_reviews("users", [{"text": "Great gameplay and story", "score": 9},

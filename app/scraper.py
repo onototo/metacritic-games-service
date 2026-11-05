@@ -198,6 +198,46 @@ def parse_reviews(scope) -> list[Review]:
     return out
 
 
+def _ld_image_url(image):
+    """JSON-LD image may be a URL string, ImageObject, or a list of either."""
+    if isinstance(image, str):
+        image = image.strip()
+        return image or None
+    if isinstance(image, dict):
+        return _ld_image_url(image.get("url")) or _ld_image_url(image.get("contentUrl"))
+    if isinstance(image, list):
+        for item in image:
+            url = _ld_image_url(item)
+            if url:
+                return url
+    return None
+
+
+def _catalog_img_url(img) -> str | None:
+    src = (img.get("src") or "").strip()
+    if "catalog/provider" in src:
+        return src
+    srcset = (img.get("srcset") or "").strip()
+    if srcset:
+        token = srcset.split(",")[0].strip().split()[0]
+        if "catalog/provider" in token:
+            return token
+    return None
+
+
+def _dom_cover_url(soup) -> str | None:
+    for sel in (
+        '[data-testid="hero-images"] img',
+        '[data-testid="hero-image"] img',
+        'img[src*="catalog/provider"]',
+    ):
+        for img in soup.select(sel):
+            url = _catalog_img_url(img)
+            if url:
+                return url
+    return None
+
+
 def parse_game(html: str, url: str) -> GameData:
     s = BeautifulSoup(html, "lxml")
     ld = {}
@@ -213,7 +253,7 @@ def parse_game(html: str, url: str) -> GameData:
     title_el = s.select_one('[data-testid="hero-title"]')
     g = GameData(url=url, slug=slug, title=ld.get("name") or (title_el.get_text(strip=True) if title_el else slug))
     g.description = ld.get("description")
-    g.cover_url = ld.get("image")
+    g.cover_url = _ld_image_url(ld.get("image")) or _dom_cover_url(s)
     g.release_date = ld.get("datePublished")
     gen = ld.get("genre")
     g.genres = gen if isinstance(gen, list) else ([gen] if gen else [])
