@@ -81,6 +81,7 @@ def test_database_url_uses_psycopg2():
     assert _sqlalchemy_url("postgres://u:p@h:5432/db") == "postgresql+psycopg2://u:p@h:5432/db"
     assert _sqlalchemy_url("postgresql://u:p@h:5432/db?sslmode=require") == "postgresql+psycopg2://u:p@h:5432/db?sslmode=require"
     assert _sqlalchemy_url("postgresql+psycopg2://u:p@h/db") == "postgresql+psycopg2://u:p@h/db"
+    assert _sqlalchemy_url("postgresql+psycopg://u:p@h/db") == "postgresql+psycopg://u:p@h/db"
     assert _sqlalchemy_url("sqlite:///./data/app.db") == "sqlite:///./data/app.db"
 
 
