@@ -225,13 +225,30 @@ def _catalog_img_url(img) -> str | None:
     return None
 
 
+def _inside_product_card(el) -> bool:
+    node = el
+    for _ in range(8):
+        node = getattr(node, "parent", None)
+        if node is None:
+            break
+        attrs = getattr(node, "attrs", None) or {}
+        tid = attrs.get("data-testid") or ""
+        cls = " ".join(attrs.get("class") or [])
+        if "product-card" in tid or "product-card" in cls or "carousel" in tid:
+            return True
+    return False
+
+
 def _dom_cover_url(soup) -> str | None:
+    """Hero/main art only. Related product-card thumbs are not this game's cover."""
     for sel in (
         '[data-testid="hero-images"] img',
         '[data-testid="hero-image"] img',
-        'img[src*="catalog/provider"]',
+        '[data-testid="product-hero"] img',
     ):
         for img in soup.select(sel):
+            if _inside_product_card(img):
+                continue
             url = _catalog_img_url(img)
             if url:
                 return url

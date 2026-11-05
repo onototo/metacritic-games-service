@@ -1,11 +1,29 @@
 {% extends "base.html" %}{% block content %}
-<form class="filters" hx-get="/" hx-target="#games" hx-trigger="input changed delay:300ms from:input, change from:select" hx-push-url="true">
+<form class="filters" hx-get="/" hx-target="#games" hx-trigger="input changed delay:300ms from:input[type=search], change from:select, change from:.platform-menu input" hx-push-url="true">
   <input type="search" name="q" value="{{ q }}" placeholder="Поиск по названию…">
-  <select name="platform"><option value="">Все платформы</option>
-    {% for p in platforms %}<option value="{{ p }}" {% if p==platform %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>
+  <details class="platform-menu">
+    <summary>{% if platform %}{{ platform|join(', ') }}{% else %}«Все платформы»{% endif %}</summary>
+    <div class="platform-panel">
+      {% for p in platforms %}
+      <label><input type="checkbox" name="platform" value="{{ p }}" {% if p in platform %}checked{% endif %}> {{ p }}</label>
+      {% endfor %}
+    </div>
+  </details>
   <select name="sort">
     {% for k,v in [("metascore","Metascore ↓"),("metascore_asc","Metascore ↑"),("userscore","Userscore ↓"),("title","Название"),("updated","Обновлённые")] %}
     <option value="{{k}}" {% if k==sort %}selected{% endif %}>{{v}}</option>{% endfor %}</select>
 </form>
 <div id="games">{% include "_games.html" %}</div>
+<script>
+(function(){
+  var menu = document.querySelector('.platform-menu');
+  if (!menu) return;
+  var summary = menu.querySelector('summary');
+  function sync(){
+    var names = Array.prototype.map.call(menu.querySelectorAll('input:checked'), function(i){ return i.value; });
+    summary.textContent = names.length ? names.join(', ') : '«Все платформы»';
+  }
+  menu.addEventListener('change', sync);
+})();
+</script>
 {% endblock %}

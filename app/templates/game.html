@@ -14,6 +14,21 @@
 <p class="muted small">{{ s.reviews_used }} отзывов · {{ s.provider }} · {{ s.updated_at.strftime('%Y-%m-%d %H:%M') }} UTC</p>{% else %}<p class="muted">Отзывов пока нет</p>{% endif %}</section>{% endfor %}</div>
 <section class="box"><h3>Летсплей (YouTube)</h3>
 {% if g.letsplay_url %}<p><a href="{{ g.letsplay_url }}" target="_blank">{{ g.letsplay_title }}</a></p><p class="pre">{{ g.letsplay_conclusion or '' }}</p>{% endif %}
-<p class="muted small">Статус: {{ g.letsplay_status or 'не обработано' }}</p></section>
+{% set st = g.letsplay_status or '' %}
+{% if not st %}
+<p class="muted small">Летсплей ещё не искали.</p>
+{% elif st == 'ok' %}
+<p class="muted small">Найден летсплей на YouTube.</p>
+{% elif st == 'not_found' %}
+<p class="muted small">Подходящий летсплей на YouTube не найден.</p>
+{% elif st == 'transcript_unavailable' %}
+<p class="muted small">Видео найдено, но транскрипт недоступен — краткий вывод сделать нельзя.</p>
+{% elif st.startswith('error:') and ('429' in st or 'Too Many Requests' in st or 'quota' in st|lower) %}
+<p class="muted small">Временно недоступно: исчерпан дневной лимит YouTube API. Попробуем снова после сброса квоты.</p>
+{% elif st.startswith('error:') %}
+<p class="muted small">Не удалось разобрать летсплей. Попробуем позже.</p>
+{% else %}
+<p class="muted small">{{ st }}</p>
+{% endif %}</section>
 <h2>Похожие игры</h2><ul>{% for sc,x in similar %}<li><a href="/games/{{ x.id }}">{{ x.title }}</a> <span class="muted small">({{ '%.2f'|format(sc) }})</span></li>{% else %}<li class="muted">Нет похожих в базе</li>{% endfor %}</ul>
 {% endblock %}

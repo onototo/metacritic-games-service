@@ -16,8 +16,18 @@ header a{color:var(--header-fg);text-decoration:none;margin-right:1rem}
 .theme-toggle{margin-left:auto;background:transparent;border:1px solid color-mix(in srgb,var(--header-fg) 35%,transparent);color:var(--header-fg);border-radius:999px;padding:.35rem .75rem;cursor:pointer;font-size:.9rem}
 .theme-toggle:hover{background:color-mix(in srgb,var(--header-fg) 12%,transparent)}
 main{max-width:1200px;margin:0 auto;padding:1.5rem}
-.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:flex-start}
 input,select,button{padding:.5rem .7rem;border:1px solid var(--input-border);border-radius:6px;font-size:1rem;background:var(--card);color:var(--fg)}
+.platform-menu{position:relative}
+.platform-menu summary{list-style:none;cursor:pointer;padding:.5rem 2rem .5rem .7rem;border:1px solid var(--input-border);border-radius:6px;background:var(--card);color:var(--fg);min-width:12rem;user-select:none;position:relative}
+.platform-menu summary::-webkit-details-marker{display:none}
+.platform-menu summary::marker{content:""}
+.platform-menu summary::after{content:"";position:absolute;right:.75rem;top:50%;width:.45rem;height:.45rem;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-70%) rotate(45deg)}
+.platform-menu[open] summary::after{transform:translateY(-20%) rotate(225deg)}
+.platform-panel{position:absolute;z-index:20;top:calc(100% + 4px);left:0;min-width:100%;max-height:280px;overflow:auto;background:#1a1d24;color:#e8eaed;border:1px solid #3c4454;border-radius:8px;box-shadow:0 8px 24px #000a;padding:.35rem}
+.platform-panel label{display:flex;align-items:center;gap:.55rem;padding:.4rem .55rem;border-radius:6px;cursor:pointer;font-size:.95rem;white-space:nowrap}
+.platform-panel label:hover{background:#2a2f3a}
+.platform-panel input[type=checkbox]{width:1rem;height:1rem;margin:0;padding:0;accent-color:#4c8bf5;flex:none}
 input[type=search]{flex:1;min-width:220px}
 button{background:var(--btn);color:var(--btn-fg);border:none;cursor:pointer}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
