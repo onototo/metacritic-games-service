@@ -33,6 +33,58 @@ def test_parse_game():
     assert g.title and g.cover_url and g.platforms and g.description
 
 
+def test_cover_url_from_ld_or_hero():
+    coverage = scraper.parse_game(read("https://www.metacritic.com/game/coverage/"),
+                                  "https://www.metacritic.com/game/coverage/")
+    assert coverage.title == "Coverage"
+    assert coverage.cover_url is None
+    assert coverage.metascore is None and coverage.userscore is None
+
+    nie = scraper.parse_game(read("https://www.metacritic.com/game/nie-xiaoqian/"),
+                             "https://www.metacritic.com/game/nie-xiaoqian/")
+    assert nie.cover_url is None
+    assert nie.metascore is None and nie.userscore is None
+
+    related = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Zukontide"}</script>
+        <div data-testid="hero-media"><div class="c-globalImagePlaceholder"></div></div>
+        <div data-testid="product-card"><img alt="Plants vs. Zombies" src="https://www.metacritic.com/a/img/catalog/provider/pvz.jpg"></div>
+        <div data-testid="carousel"><img alt="Zukontide" src="https://www.metacritic.com/a/img/catalog/provider/carousel.jpg"></div>
+        <img alt="" src="https://www.metacritic.com/a/img/catalog/provider/blank.jpg">'''
+    assert scraper.parse_game(related, "https://www.metacritic.com/game/zukontide/").cover_url is None
+
+    titled = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Zukontide"}</script>
+        <div data-testid="product-card"><img alt="Zukontide" src="https://www.metacritic.com/a/img/catalog/provider/card.jpg"></div>
+        <img alt="Zukontide cover" src="https://www.metacritic.com/a/img/catalog/provider/own.jpg">'''
+    assert scraper.parse_game(titled, "https://www.metacritic.com/game/zukontide/").cover_url.endswith("own.jpg")
+
+    as_dict = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Dict Cover",
+        "image":{"url":"https://www.metacritic.com/a/img/catalog/provider/from-dict.jpg"}}</script>'''
+    assert scraper.parse_game(as_dict, "https://www.metacritic.com/game/dict-cover/").cover_url.endswith("from-dict.jpg")
+
+    as_list = '''<script type="application/ld+json">{"@type":"VideoGame","name":"List Cover",
+        "image":[{"contentUrl":"https://www.metacritic.com/a/img/catalog/provider/from-list.jpg"}]}</script>
+        <img src="https://www.metacritic.com/a/img/catalog/provider/dom-should-lose.jpg">'''
+    assert scraper.parse_game(as_list, "https://www.metacritic.com/game/list-cover/").cover_url.endswith("from-list.jpg")
+
+    srcset = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Srcset Cover"}</script>
+        <div data-testid="hero-images"><img srcset="https://www.metacritic.com/a/img/catalog/provider/hero.jpg 1x, https://x/2.jpg 2x"></div>
+        <div data-testid="product-card"><img src="https://www.metacritic.com/a/img/catalog/provider/later.jpg"></div>'''
+    assert scraper.parse_game(srcset, "https://www.metacritic.com/game/srcset-cover/").cover_url.endswith("hero.jpg")
+
+    pb_url = "https://www.metacritic.com/game/phantom-blade-zero/"
+    pb = scraper.parse_game(read(pb_url), pb_url)
+    assert "7-1792649959" in pb.cover_url and pb.metascore == 88
+
+
+def test_database_url_uses_psycopg2():
+    from app.db import _sqlalchemy_url
+    assert _sqlalchemy_url("postgres://u:p@h:5432/db") == "postgresql+psycopg2://u:p@h:5432/db"
+    assert _sqlalchemy_url("postgresql://u:p@h:5432/db?sslmode=require") == "postgresql+psycopg2://u:p@h:5432/db?sslmode=require"
+    assert _sqlalchemy_url("postgresql+psycopg2://u:p@h/db") == "postgresql+psycopg2://u:p@h/db"
+    assert _sqlalchemy_url("postgresql+psycopg://u:p@h/db") == "postgresql+psycopg://u:p@h/db"
+    assert _sqlalchemy_url("sqlite:///./data/app.db") == "sqlite:///./data/app.db"
+
+
 def test_mock_summary_and_jsonl():
     from app import llm
     text, prov = llm.summarize_reviews("users", [{"text": "Great gameplay and story", "score": 9},
@@ -63,7 +115,32 @@ def test_seed_run_and_api():
     assert "critics" in d["summaries"] and "similar" in d
     plat = games[0]["platforms"][0]["platform"]
     assert all(any(p["platform"] == plat for p in g["platforms"]) for g in c.get("/api/games", params={"platform": plat}).json())
-    assert c.get("/").status_code == 200 and c.get(f"/games/{games[0]['id']}").status_code == 200
+    names = sorted({p["platform"] for g in games for p in g["platforms"]})
+    assert len(names) >= 2
+    both = c.get("/api/games", params=[("platform", names[0]), ("platform", names[1])]).json()
+    assert both and all(any(p["platform"] in names[:2] for p in g["platforms"]) for g in both)
+    page = c.get("/", params=[("platform", names[0]), ("platform", names[1])]).text
+    assert 'class="platform-menu"' in page and "change from:.platform-menu input" in page
+    assert f'value="{names[0]}"' in page and "checked" in page
+    assert f"{names[0]}, {names[1]}" in page and "«Все платформы»" in c.get("/").text
+    game_page = c.get(f"/games/{games[0]['id']}")
+    assert game_page.status_code == 200
+    assert "ENABLE_YOUTUBE" not in game_page.text and "googleapis" not in game_page.text
+    assert "Не удалось разобрать летсплей" in game_page.text
+    from app.db import SessionLocal
+    from app.models import Game
+    with SessionLocal() as s:
+        row = s.get(Game, games[0]["id"])
+        row.letsplay_status = "error: <HttpError 429 when requesting https://www.googleapis.com/youtube/v3/search quota>"
+        s.commit()
+    page = c.get(f"/games/{games[0]['id']}").text
+    assert "исчерпан дневной лимит YouTube API" in page
+    assert "googleapis" not in page and "HttpError" not in page
+    with SessionLocal() as s:
+        row = s.get(Game, games[0]["id"])
+        row.letsplay_status = "error: boom"
+        s.commit()
+    assert "Не удалось разобрать летсплей" in c.get(f"/games/{games[0]['id']}").text
     assert c.get("/monitor").status_code == 200
     # second run same day must not re-take new releases
     from app.db import SessionLocal

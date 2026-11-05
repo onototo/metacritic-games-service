@@ -65,12 +65,26 @@ SORTS = {"metascore": Game.metascore.desc().nullslast(), "userscore": Game.users
          "metascore_asc": Game.metascore.asc().nullslast()}
 
 
+def _platforms_arg(platform) -> list[str] | None:
+    if platform is None:
+        return None
+    if isinstance(platform, str):
+        platform = [platform]
+    plats = []
+    for p in platform:
+        p = (p or "").strip()
+        if p and p not in plats:
+            plats.append(p)
+    return plats or None
+
+
 def query_games(s, q=None, platform=None, sort="metascore"):
     st = select(Game)
     if q:
         st = st.where(Game.title.ilike(f"%{q}%"))
-    if platform:
-        st = st.where(Game.platforms.any(GamePlatformScore.platform == platform))
+    plats = _platforms_arg(platform)
+    if plats:
+        st = st.where(Game.platforms.any(GamePlatformScore.platform.in_(plats)))
     return list(s.scalars(st.order_by(SORTS.get(sort, SORTS["metascore"]), Game.id)))
 
 
@@ -87,7 +101,7 @@ def health(s=Depends(db)):
 
 
 @app.get("/api/games")
-def api_games(q: str | None = None, platform: str | None = None, sort: str = "metascore", s=Depends(db)):
+def api_games(q: str | None = None, platform: list[str] | None = Query(None), sort: str = "metascore", s=Depends(db)):
     return [game_dict(g) for g in query_games(s, q, platform, sort)]
 
 
@@ -156,9 +170,10 @@ async def events_stream(request: Request):
 
 # ---------------- UI ----------------
 @app.get("/", response_class=HTMLResponse)
-def ui_list(request: Request, q: str | None = None, platform: str | None = None, sort: str = "metascore", s=Depends(db)):
-    games = query_games(s, q, platform, sort)
-    ctx = {"request": request, "games": games, "q": q or "", "platform": platform or "", "sort": sort,
+def ui_list(request: Request, q: str | None = None, platform: list[str] | None = Query(None), sort: str = "metascore", s=Depends(db)):
+    plats = _platforms_arg(platform) or []
+    games = query_games(s, q, plats, sort)
+    ctx = {"request": request, "games": games, "q": q or "", "platform": plats, "sort": sort,
            "platforms": all_platforms(s)}
     if request.headers.get("HX-Request"):
         return templates.TemplateResponse(request, "_games.html", ctx)

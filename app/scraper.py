@@ -198,6 +198,90 @@ def parse_reviews(scope) -> list[Review]:
     return out
 
 
+def _ld_image_url(image):
+    """JSON-LD image may be a URL string, ImageObject, or a list of either."""
+    if isinstance(image, str):
+        image = image.strip()
+        return image or None
+    if isinstance(image, dict):
+        return _ld_image_url(image.get("url")) or _ld_image_url(image.get("contentUrl"))
+    if isinstance(image, list):
+        for item in image:
+            url = _ld_image_url(item)
+            if url:
+                return url
+    return None
+
+
+def _catalog_img_url(img) -> str | None:
+    src = (img.get("src") or "").strip()
+    if "catalog/provider" in src:
+        return src
+    srcset = (img.get("srcset") or "").strip()
+    if srcset:
+        token = srcset.split(",")[0].strip().split()[0]
+        if "catalog/provider" in token:
+            return token
+    return None
+
+
+def _inside_product_card(el) -> bool:
+    node = el
+    for _ in range(8):
+        node = getattr(node, "parent", None)
+        if node is None:
+            break
+        attrs = getattr(node, "attrs", None) or {}
+        tid = attrs.get("data-testid") or ""
+        cls = " ".join(attrs.get("class") or [])
+        if "product-card" in tid or "product-card" in cls or "carousel" in tid or "carousel" in cls:
+            return True
+    return False
+
+
+def _img_src(img) -> str | None:
+    src = (img.get("src") or "").strip()
+    if not src and img.get("srcset"):
+        src = (img.get("srcset") or "").split(",")[0].strip().split()[0]
+    if src and " " in src:
+        src = src.split()[0]
+    return src or None
+
+
+def _alt_matches_title(alt: str, title: str) -> bool:
+    alt_l = (alt or "").casefold().strip()
+    title_l = (title or "").casefold().strip()
+    if len(alt_l) < 3 or not title_l:
+        return False
+    return title_l in alt_l or alt_l in title_l
+
+
+def _dom_cover_url(soup, title: str | None = None) -> str | None:
+    """Hero art, then a catalog image whose alt is this title. Never a related card."""
+    for sel in (
+        '[data-testid="hero-images"] img',
+        '[data-testid="hero-image"] img',
+        '[data-testid="product-hero"] img',
+    ):
+        for img in soup.select(sel):
+            if _inside_product_card(img):
+                continue
+            src = _img_src(img)
+            if src:
+                return src
+    if not title:
+        return None
+    for img in soup.select('img[src*="catalog/provider"], img[srcset*="catalog/provider"]'):
+        if _inside_product_card(img):
+            continue
+        if not _alt_matches_title(img.get("alt") or "", title):
+            continue
+        src = _catalog_img_url(img) or _img_src(img)
+        if src and "catalog/provider" in src:
+            return src
+    return None
+
+
 def parse_game(html: str, url: str) -> GameData:
     s = BeautifulSoup(html, "lxml")
     ld = {}
@@ -213,7 +297,7 @@ def parse_game(html: str, url: str) -> GameData:
     title_el = s.select_one('[data-testid="hero-title"]')
     g = GameData(url=url, slug=slug, title=ld.get("name") or (title_el.get_text(strip=True) if title_el else slug))
     g.description = ld.get("description")
-    g.cover_url = ld.get("image")
+    g.cover_url = _ld_image_url(ld.get("image")) or _dom_cover_url(s, g.title)
     g.release_date = ld.get("datePublished")
     gen = ld.get("genre")
     g.genres = gen if isinstance(gen, list) else ([gen] if gen else [])
