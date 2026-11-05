@@ -46,8 +46,16 @@ def test_cover_url_from_ld_or_hero():
     assert nie.metascore is None and nie.userscore is None
 
     related = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Zukontide"}</script>
-        <div data-testid="product-card"><img alt="Plants vs. Zombies" src="https://www.metacritic.com/a/img/catalog/provider/pvz.jpg"></div>'''
+        <div data-testid="hero-media"><div class="c-globalImagePlaceholder"></div></div>
+        <div data-testid="product-card"><img alt="Plants vs. Zombies" src="https://www.metacritic.com/a/img/catalog/provider/pvz.jpg"></div>
+        <div data-testid="carousel"><img alt="Zukontide" src="https://www.metacritic.com/a/img/catalog/provider/carousel.jpg"></div>
+        <img alt="" src="https://www.metacritic.com/a/img/catalog/provider/blank.jpg">'''
     assert scraper.parse_game(related, "https://www.metacritic.com/game/zukontide/").cover_url is None
+
+    titled = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Zukontide"}</script>
+        <div data-testid="product-card"><img alt="Zukontide" src="https://www.metacritic.com/a/img/catalog/provider/card.jpg"></div>
+        <img alt="Zukontide cover" src="https://www.metacritic.com/a/img/catalog/provider/own.jpg">'''
+    assert scraper.parse_game(titled, "https://www.metacritic.com/game/zukontide/").cover_url.endswith("own.jpg")
 
     as_dict = '''<script type="application/ld+json">{"@type":"VideoGame","name":"Dict Cover",
         "image":{"url":"https://www.metacritic.com/a/img/catalog/provider/from-dict.jpg"}}</script>'''
@@ -114,7 +122,10 @@ def test_seed_run_and_api():
     assert 'class="platform-menu"' in page and "change from:.platform-menu input" in page
     assert f'value="{names[0]}"' in page and "checked" in page
     assert f"{names[0]}, {names[1]}" in page and "«Все платформы»" in c.get("/").text
-    assert c.get("/").status_code == 200 and c.get(f"/games/{games[0]['id']}").status_code == 200
+    game_page = c.get(f"/games/{games[0]['id']}")
+    assert game_page.status_code == 200
+    assert "ENABLE_YOUTUBE" not in game_page.text and "googleapis" not in game_page.text
+    assert "Не удалось разобрать летсплей" in game_page.text
     from app.db import SessionLocal
     from app.models import Game
     with SessionLocal() as s:

@@ -25,10 +25,8 @@
 <p class="muted small">Видео найдено, но транскрипт недоступен — краткий вывод сделать нельзя.</p>
 {% elif st.startswith('error:') and ('429' in st or 'Too Many Requests' in st or 'quota' in st|lower) %}
 <p class="muted small">Временно недоступно: исчерпан дневной лимит YouTube API. Попробуем снова после сброса квоты.</p>
-{% elif st.startswith('error:') %}
-<p class="muted small">Не удалось разобрать летсплей. Попробуем позже.</p>
 {% else %}
-<p class="muted small">{{ st }}</p>
+<p class="muted small">Не удалось разобрать летсплей. Попробуем позже.</p>
 {% endif %}</section>
 <h2>Похожие игры</h2><ul>{% for sc,x in similar %}<li><a href="/games/{{ x.id }}">{{ x.title }}</a> <span class="muted small">({{ '%.2f'|format(sc) }})</span></li>{% else %}<li class="muted">Нет похожих в базе</li>{% endfor %}</ul>
 {% endblock %}
